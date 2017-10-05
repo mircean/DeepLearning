@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,8 +14,8 @@ from sklearn import preprocessing
 from sklearn.preprocessing import OneHotEncoder
 
 #train/test split
-#from sklearn.model_selection import train_test_split
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
+#from sklearn.cross_validation import train_test_split
 
 #metrics
 from sklearn.metrics import accuracy_score
@@ -40,7 +41,7 @@ class KerasCallback(keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         if self.verbose != None and epoch % self.verbose == 0:
-            print(epoch, logs['loss'], logs['acc'], logs['val_acc'])        
+            print(epoch, logs)
 
 def titanic_prep(api='dnn'):
     test_size=0.2
@@ -401,7 +402,8 @@ def zillow_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     dnn.compile()
 
     gradient_check=False
-    verbose = None
+    #verbose = None
+    verbose = 100
 
     results = dnn.fit(X_train, Y_train, eval_set=[(X_train, Y_train), (X_dev, Y_dev)], eval_metric='mae', learning_rate=learning_rate, epochs=epochs, batch_size=batch_size, gradient_check=gradient_check, verbose=verbose)
 
@@ -446,9 +448,10 @@ def zillow_keras(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['mae'])
 
     initial_epoch = 0
+    #verbose = 1
     verbose = 0
-    #verbose2 = 10
-    verbose2 = None
+    verbose2 = 100
+    #verbose2 = None
     results = model.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, callbacks=[KerasCallback(verbose2)], validation_data = (X_dev, Y_dev), verbose=verbose, initial_epoch=initial_epoch)
 
     Y_predict = model.predict(X_train)
@@ -463,9 +466,17 @@ def zillow_keras(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
         accuracy_dev = 0
 
     print(accuracy_train, accuracy_dev, hidden_1, hidden_2, activation, epochs, learning_rate, batch_size, method, momentum)
-
+    
+    '''
+    plt.plot(results.history['mean_absolute_error'])
+    plt.show()
+    df_eval0 = pd.DataFrame(results.history['mean_absolute_error'])
+    df_eval0[0].ewm(span=50).mean().plot(style='k')
+    plt.show()
+    '''
 
 np.random.seed(0) 
+'''
 #titanic
 X_train, X_dev, Y_train, Y_dev = titanic_prep('dnn')
 titanic_dnn(X_train, X_dev, Y_train, Y_dev)
@@ -479,13 +490,18 @@ X_train, X_dev, Y_train, Y_dev = MNIST_prep('dnn')
 MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
 X_train, X_dev, Y_train, Y_dev = MNIST_prep('keras')
 MNIST_keras(parameters, X_train, X_dev, Y_train, Y_dev)
+'''
 
 #Zillow
-parameters = (50, 50, 'relu', 500, 0.01, 512, 'RMSProp', 0)
+parameters = (100, 20, 'relu', 500, 0.005, 512, 'Adam', 0)
 X_train, X_dev, Y_train, Y_dev = zillow_prep('dnn')
-zillow_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
+print(datetime.datetime.now())
+#zillow_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
+print(datetime.datetime.now())
 #zillow_tune(X_train, X_dev, Y_train, Y_dev, 'dnn')
-X_train, X_dev, Y_train, Y_dev = zillow_prep('keras')
-zillow_keras(parameters, X_train, X_dev, Y_train, Y_dev)
-#zillow_tune(X_train, X_dev, Y_train, Y_dev, 'keras')
 
+X_train, X_dev, Y_train, Y_dev = zillow_prep('keras')
+print(datetime.datetime.now())
+zillow_keras(parameters, X_train, X_dev, Y_train, Y_dev)
+print(datetime.datetime.now())
+#zillow_tune(X_train, X_dev, Y_train, Y_dev, 'keras')
