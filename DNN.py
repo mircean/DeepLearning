@@ -41,13 +41,16 @@ def identity(Z):
     return Z
 
 def sigmoid(Z):
-    #numeric stability. a = 1/(1+np.exp(-37)) = 1.0 then log(1-a) in binary_crossentropy is infinite
+    #numeric stability
+    #a = 1/(1+np.exp(-37)) = 1.0 then log(1-a) in binary_crossentropy is infinite
     Z[Z > 32] = 32
     A = 1/(1 + np.exp(-Z))
     return A
 
 def softmax(Z):
-    A = np.exp(Z)/np.sum(np.exp(Z), axis=0)
+    #A = np.exp(Z)/np.sum(np.exp(Z), axis=0)
+    #for numerical stability
+    A = np.exp(Z - np.max(Z, axis=0))/np.sum(np.exp(Z - np.max(Z, axis=0)), axis=0)
     return A
 #
 #cost functions
@@ -60,6 +63,9 @@ def binary_crossentropy(AL, Y):
     return cost
 
 def categorical_crossentropy(AL, Y):
+    #numeric stability 
+    #np.log(1e-324) = -inf
+    AL[AL < 1e-300] = 1e-300
     m = Y.shape[1] # number of examples
     logprobs = np.multiply(np.log(AL), Y)
     cost = -np.sum(np.sum(logprobs, axis=0))/m
@@ -421,6 +427,7 @@ class DNN:
 
             for minibatch in minibatches:
                 self.minibatches += 1
+                #print(self.epochs, self.minibatches)
                 (minibatch_X, minibatch_Y) = minibatch
 
                 # Forward propagation.

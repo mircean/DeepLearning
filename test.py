@@ -225,7 +225,7 @@ def MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     if random_seed != None:
         np.random.seed(random_seed)
 
-    hidden_1, hidden_2, activation, epochs, learning_rate, batch_size, method, momentum = parameters
+    hidden, activation, epochs, learning_rate, batch_size, method, momentum = parameters
     if activation == 'tanh':
         initializer = 'Lecun'
         activation = np.tanh
@@ -240,8 +240,8 @@ def MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
 
     dnn = DNN.DNN()
     dnn.add_input_layer(X_train.shape[0])
-    dnn.add_layer(hidden_1, activation)
-    dnn.add_layer(hidden_2, activation)
+    for x in hidden:
+        dnn.add_layer(x, activation)
     dnn.add_layer(10, DNN.softmax)
     dnn.costfunction = DNN.categorical_crossentropy
     dnn.init = initializer
@@ -483,16 +483,17 @@ titanic_dnn(X_train, X_dev, Y_train, Y_dev)
 parameters = (20, 10, 'tanh', 10000, 0.001, 'Adam', 0)
 X_train, X_dev, Y_train, Y_dev = titanic_prep('keras')
 titanic_keras(parameters, X_train, X_dev, Y_train, Y_dev)
-
-#MNIST
-parameters = (200, 50, 'tanh', 100, 0.1, 256, 'GD', 0.9)
-X_train, X_dev, Y_train, Y_dev = MNIST_prep('dnn')
-MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
-X_train, X_dev, Y_train, Y_dev = MNIST_prep('keras')
-MNIST_keras(parameters, X_train, X_dev, Y_train, Y_dev)
 '''
 
+#MNIST
+parameters = ([200, 50], 'relu', 100, 0.1, 256, 'Adam', 0)
+X_train, X_dev, Y_train, Y_dev = MNIST_prep('dnn')
+MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
+#X_train, X_dev, Y_train, Y_dev = MNIST_prep('keras')
+#MNIST_keras(parameters, X_train, X_dev, Y_train, Y_dev)
+
 #Zillow
+'''
 parameters = (100, 20, 'relu', 500, 0.005, 512, 'Adam', 0)
 X_train, X_dev, Y_train, Y_dev = zillow_prep('dnn')
 print(datetime.datetime.now())
@@ -505,3 +506,4 @@ print(datetime.datetime.now())
 zillow_keras(parameters, X_train, X_dev, Y_train, Y_dev)
 print(datetime.datetime.now())
 #zillow_tune(X_train, X_dev, Y_train, Y_dev, 'keras')
+'''
