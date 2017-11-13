@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,18 +16,31 @@ namespace ModelWrapper
     {
         static void Main(string[] args)
         {
+            //model1
             string pythonPath = @"C:\ProgramData\Anaconda3\Lib\site-packages";
             string pythonCode = @"..\..\..\TestKeras.py";
             string modelFile = @"..\..\..\MNIST\keras.h5";
-            string input = @"..\..\..\MNIST\test.csv";
-            string output = @"..\..\..\MNIST\predict.csv";
+            //model2
+            string pythonServiceUrl = "http://mircean-p710:1234";
 
-            ModelWrapper model = new ModelWrapper(pythonPath,
-                pythonCode,
-                modelFile);
+            string input = @"C:\Users\mircean\git\DeepLearningMNIST\test.csv";
+            string output = @"C:\Users\mircean\git\DeepLearning\MNIST\predict.csv";
 
-            model.Predict(input, output);
+            int method = 2;
+            if (method == 1)
+            {
+                ModelWrapper model = new ModelWrapper(pythonPath,
+                    pythonCode,
+                    modelFile);
 
+                model.Predict(input, output);
+            }
+            if (method == 2)
+            {
+                ModelWrapper2 model = new ModelWrapper2(pythonServiceUrl);
+
+                model.Predict(input, output);
+            }
             using (StreamReader sr = new StreamReader(output))
             {
                 var classId = sr.ReadLine();
@@ -63,6 +78,23 @@ namespace ModelWrapper
                 dynamic py_model = Py.Import(m_pythonCode);
                 py_model.predict(m_modelFile, input, output);
             }
+        }
+    }
+
+    class ModelWrapper2
+    {
+        Uri m_uri;
+        static HttpClient client = new HttpClient();
+
+        public ModelWrapper2(string url)
+        {
+            m_uri = new Uri(url);
+        }
+
+        public void Predict(string input, string output)
+        {
+            string requestString = "Body\r\n" + input + "\r\n" + output;
+            var response = client.PostAsync(m_uri, new StringContent(requestString)).Result;
         }
     }
 }

@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a5b814b1-4578-4826-8792-8c6bf6f88102</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>TestKeras.py</StartupFile>
+    <StartupFile>WebService.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -30,6 +30,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TestKeras.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WebService.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
