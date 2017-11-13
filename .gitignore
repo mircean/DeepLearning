@@ -13,3 +13,10 @@
 /Zillow/train_2016_v2.csv
 /Zillow/properties_2016.csv
 /__pycache__
+/ModelWrapper/bin/Debug
+/ModelWrapper/obj/Debug
+/MNIST/test.csv
+/MNIST/predict.csv
+/MNIST/output.csv
+/MNIST/keras.h5
+/Zillow/keras.h5

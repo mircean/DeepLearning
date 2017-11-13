@@ -133,7 +133,7 @@ class DNN:
             self.optimizer = ('Adam', 0.9, 0.999, 1e-8)
         assert(self.optimizer[0] in ['GD', 'RMSProp', 'Adam'])
 
-        assert(self.lambd >= 0 and self.lambd < 1)
+        #assert(self.lambd >= 0 and self.lambd < 1)
 
         self.__initialize_parameters()
 

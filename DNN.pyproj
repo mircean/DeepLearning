@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a5b814b1-4578-4826-8792-8c6bf6f88102</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>test.py</StartupFile>
+    <StartupFile>TestKeras.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -27,6 +27,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestKeras.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

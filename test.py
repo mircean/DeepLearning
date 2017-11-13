@@ -225,7 +225,7 @@ def MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     if random_seed != None:
         np.random.seed(random_seed)
 
-    hidden, activation, epochs, learning_rate, batch_size, method, momentum = parameters
+    hidden, activation, epochs, learning_rate, batch_size, method, momentum, lambd = parameters
     if activation == 'tanh':
         initializer = 'Lecun'
         activation = np.tanh
@@ -234,9 +234,6 @@ def MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
         activation = DNN.relu
     else:
         raise ValueError('activation')
-
-    regularizer = None
-    #regularizer = regularizers.l2(0.01)
 
     dnn = DNN.DNN()
     dnn.add_input_layer(X_train.shape[0])
@@ -250,6 +247,7 @@ def MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     else:
         optimizer = method
     dnn.optimizer = optimizer
+    dnn.lambd = lambd
     dnn.compile()
 
     gradient_check=False
@@ -263,7 +261,7 @@ def MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     Y_predict = dnn.predict(X_dev)
     accuracy_dev = accuracy_score(Y_predict.argmax(axis=0), Y_dev.argmax(axis=0))
 
-    print(accuracy_train, accuracy_dev, hidden_1, hidden_2, activation, epochs, learning_rate, batch_size, method, momentum)
+    print(accuracy_train, accuracy_dev, hidden, activation, epochs, learning_rate, batch_size, method, momentum, lambd)
 
 def MNIST_keras(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     #random seed for parameters init, batch shuffle
@@ -384,9 +382,6 @@ def zillow_dnn(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     else:
         raise ValueError('activation')
 
-    regularizer = None
-    #regularizer = regularizers.l2(0.01)
-
     dnn = DNN.DNN()
     dnn.add_input_layer(X_train.shape[0])
     dnn.add_layer(hidden_1, activation)
@@ -475,6 +470,44 @@ def zillow_keras(parameters, X_train, X_dev, Y_train, Y_dev, random_seed=None):
     plt.show()
     '''
 
+def MNIST_tune(X_train, X_dev, Y_train, Y_dev, api='dnn'):
+    hidden_1_values = [200]
+    hidden_2_values = [50]
+    activations = ['relu']
+    epochs_values = [100]
+    learning_rates = [0.01]
+    batch_sizes = [256]
+    methods = ['Adam']
+    #momentum_values = [0, 0.9, 0.98]
+    lambd_values = [1, 3.33, 10]
+
+    configs = []
+    for hidden_1 in hidden_1_values:
+        for hidden_2 in hidden_2_values:
+            hidden = [hidden_1, hidden_2]
+            for activation in activations:
+                for epochs in epochs_values:
+                    for learning_rate in learning_rates:
+                        for batch_size in batch_sizes:
+                            for lambd in lambd_values:
+                                for method in methods:
+                                    if method == 'GD':
+                                        for momentum in momentum_values:
+                                            configs.append([hidden, activation, epochs, learning_rate, batch_size, method, momentum, lambd])
+                                    else:
+                                        configs.append((hidden, activation, epochs, learning_rate, batch_size, method, 0, lambd))
+
+
+    print(len(configs))
+    for parameters in configs:
+        np.random.seed(0) # set a seed so that the results are consistent
+        if api == 'dnn':
+            MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
+        elif api == 'keras':
+            MNIST_keras(parameters, X_train, X_dev, Y_train, Y_dev)
+        else:
+            raise ValueError('api')
+
 np.random.seed(0) 
 '''
 #titanic
@@ -486,9 +519,11 @@ titanic_keras(parameters, X_train, X_dev, Y_train, Y_dev)
 '''
 
 #MNIST
-parameters = ([200, 50], 'relu', 100, 0.1, 256, 'Adam', 0)
 X_train, X_dev, Y_train, Y_dev = MNIST_prep('dnn')
-MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
+#parameters = ([200, 50], 'relu', 100, 0.1, 256, 'Adam', 0)
+#MNIST_dnn(parameters, X_train, X_dev, Y_train, Y_dev)
+MNIST_tune(X_train, X_dev, Y_train, Y_dev, 'dnn')
+
 #X_train, X_dev, Y_train, Y_dev = MNIST_prep('keras')
 #MNIST_keras(parameters, X_train, X_dev, Y_train, Y_dev)
 
